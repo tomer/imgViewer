@@ -6,17 +6,31 @@
     <title>Image viewer</title>
     <script type="text/javascript">
 function loadImage() { 
-  var img = document.getElementById("main");
+  var img = document.createElement('img')
   img.src = "splash.png";
+  
+  document.getElementById('container').appendChild(img);
 
   var favicon = document.createElement("link");
   favicon.rel = 'shortcut icon';
-  favicon.href= img.src;
+  favicon.id = 'shortcut-icon';
   document.getElementsByTagName('head')[0].appendChild(favicon);
+  updateFavIcon(img);
+}
+
+function updateFavIcon(img) {
+  document.getElementById('shortcut-icon').href = img.src;
+}
+
+function getImageElement() {
+  var index = parseInt(document.getElementById('container').dataset['activeIndex']) || 0;
+  var imgs = document.getElementById('container').getElementsByTagName('img');
+  
+  return (imgs[index] || imgs[0]);
 }
 
 function download() {
-  var img = document.getElementById("main");
+  var img = getImageElement();
   var link = document.createElement('a');
   link.href = img.src;
   link.download = img.file||"";
@@ -31,6 +45,7 @@ function openFile() {
     fileInput.type="file";
     fileInput.id="input";
     fileInput.accept="image/*";
+    fileInput.multiple="multiple";
     fileInput.style.display="none";
     fileInput.addEventListener("change", handleFiles, false);
     document.body.appendChild(fileInput);
@@ -39,39 +54,79 @@ function openFile() {
 }
 
 function handleFiles() {
-  var img = document.getElementById("main");
+  deleteAllImgs();
+  var img;
   for (let file of this.files) {
+    img = document.createElement('img');
+    img.style.display="none";
+    img.disabled="disabled";
     img.file = file.name;
     var reader = new FileReader();
     reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
     reader.readAsDataURL(file);
+    document.getElementById('container').appendChild(img);
   }
+  showImg(0);
 }
 
 function zoomIn() {
-  var img = document.getElementById("main");
+  var img = getImageElement();
   var scale = window.getComputedStyle(img).getPropertyValue('--scale');
   scale *=2;
   img.style.setProperty('--scale', scale);
 }
 
 function zoomOut() {
-  var img = document.getElementById("main");
+  var img = getImageElement();
   var scale = window.getComputedStyle(img).getPropertyValue('--scale');
   scale /=2;
   img.style.setProperty('--scale', scale);
 }
 
 function zoomRegular() {
-  var img = document.getElementById("main");
+  var img = getImageElement();
   img.style.setProperty('--scale', 1);
 }
 
 function rotate(rotate) {
-  var img = document.getElementById("main");
+  var img = getImageElement();
   var angle = window.getComputedStyle(img).getPropertyValue('--rotate');
   angle = parseInt(angle);
   img.style.setProperty('--rotate', (rotate + angle) + 'deg');
+}
+
+function showImg(index) {
+  document.getElementById('container').dataset['activeIndex'] = index;
+  var img = getImageElement();
+  img.style.display="block";
+  delete img.disabled;
+  console.log("Showing image " + (index+1));
+  updateFavIcon(img)
+}
+
+function showImgOffset(offset) {
+  getImageElement().style.display="none";
+  getImageElement().disabled="disabled";
+  var index = parseInt(document.getElementById('container').dataset['activeIndex']) || 0;
+  var count = document.getElementById('container').getElementsByTagName('img').length;
+  console.log("Hiding image " + (index +1) + " of " + count );
+  index += offset;
+  if (index<0) index+=count;
+  if (index>=count) index-=count;
+  showImg(index);
+}
+
+function deleteAllImgs() {
+  document.getElementById('container').textContent="";
+  document.getElementById('container').dataset['activeIndex'] = 0;
+}
+
+function nextImg() {
+  showImgOffset(+1);
+}
+
+function prevImg() {
+  showImgOffset(-1);
 }
 
 function main() {
@@ -85,7 +140,7 @@ function main() {
   width: 100%;
   text-align: center;
 }
-img#main {
+#container img {
   position: absolute; top: 0; bottom: 0; left: 0; right: 0;
   margin: auto;
   transition: all 0.5s ease-in;
@@ -93,6 +148,11 @@ img#main {
   --scale: 1;
   --rotate: 0deg;
 }
+
+#container img[disabled="disabled"] { 
+  display: none;
+}
+
 body {
   background-image: url(imagedoc-darknoise.png);
 }
@@ -105,12 +165,13 @@ body {
       <button onclick="zoomOut()">-</button>
       <button onclick="zoomRegular()">100%</button>
       <button onclick="zoomIn()">+</button>
+      <button onclick="prevImg()">←</button>
+      <button onclick="nextImg()">→</button>
       <button onclick="rotate(-90)">↶</button>
       <button onclick="rotate(90)">↷</button>
       <button onclick="download()">Download</button>
     </div>
     <div id="container">
-      <img id="main" alt="Image" />
     </div>
   </body>
 </html>
