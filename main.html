@@ -7,6 +7,11 @@
 function loadImage() { 
   var img = document.getElementById("main");
   img.src = "splash.png";
+
+  var favicon = document.createElement("link");
+  favicon.rel = 'shortcut icon';
+  favicon.href= img.src;
+  document.getElementsByTagName('head')[0].appendChild(favicon);
 }
 
 function zoomIn() {
