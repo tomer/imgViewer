@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Image viewer</title>
+    <script type="text/javascript">
+function loadImage() { 
+	var img = document.getElementById("main");
+	img.src = "splash.png";
+	img.originalWidth = img.width;
+	img.originalHeight = img.height;
+
+	img.rotate="0";
+	img.width = img.width;
+}
+
+function zoomIn() {
+	var img = document.getElementById("main");
+	img.width *= 2;
+}
+
+function zoomOut() {
+	var img = document.getElementById("main");
+	img.width /= 2;
+}
+
+function zoomRegular() {
+	var img = document.getElementById("main");
+	img.width = img.originalWidth;
+	//img.height = img.originalHeight;
+}
+
+function rotate(angle) {
+	var img = document.getElementById("main");
+	img.rotate += angle;
+	img.style.transform = "rotate("+ img.rotate +"deg)";
+	img.rotate%=360;
+	//if (img.rotate < 0) img.rotate *= -1;
+}
+
+function main() {
+	loadImage();
+}
+    </script>
+<style>
+#toolbar {
+	margin: auto;
+	display: inline-block;
+}
+img#main {
+  position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+  margin: auto;
+  border: 2px solid blue;
+  transition: all 0.5s ease-in;
+}
+body {
+  background-image: url(chrome://global/skin/media/imagedoc-darknoise.png);
+}
+</style>
+
+  </head>
+  <body onload="main()">
+    <div id="toolbar"> 
+	    <button onclick="zoomOut()">-</button>
+	    <button onclick="zoomRegular()">100%</button>
+	    <button onclick="zoomIn()">+</button>
+	    <button onclick="rotate(90)">RotL</button>
+	    <button onclick="rotate(-90)">RotR</button>
+    </div>
+    <div id="container">
+      <img id="main" alt="Image" />
+    </div>
+  </body>
+</html>
