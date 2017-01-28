@@ -18,6 +18,7 @@ function download() {
   var img = document.getElementById("main");
   var link = document.createElement('a');
   link.href = img.src;
+  link.download = img.file||"";
   document.body.appendChild(link);
   link.click();
 }
@@ -38,6 +39,7 @@ function openFile() {
 function handleFiles() {
   var img = document.getElementById("main");
   for (let file of this.files) {
+    img.file = file.name;
     var reader = new FileReader();
     reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
     reader.readAsDataURL(file);
