@@ -18,9 +18,30 @@ function download() {
   var img = document.getElementById("main");
   var link = document.createElement('a');
   link.href = img.src;
-  link.download = "";
   document.body.appendChild(link);
   link.click();
+}
+
+function openFile() {
+  var fileInput = document.getElementById("input");
+  if (null === fileInput) {
+    fileInput = document.createElement('input');
+    fileInput.type="file";
+    fileInput.id="input";
+    fileInput.style.display="none";
+    fileInput.addEventListener("change", handleFiles, false);
+    document.body.appendChild(fileInput);
+  }
+  fileInput.click();
+}
+
+function handleFiles() {
+  var img = document.getElementById("main");
+  for (let file of this.files) {
+    var reader = new FileReader();
+    reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
+    reader.readAsDataURL(file);
+  }
 }
 
 function zoomIn() {
@@ -75,7 +96,8 @@ body {
 
   </head>
   <body onload="main()">
-    <div id="toolbar"> 
+    <div id="toolbar">
+      <button onclick="openFile()">Open</button>
       <button onclick="zoomOut()">-</button>
       <button onclick="zoomRegular()">100%</button>
       <button onclick="zoomIn()">+</button>
