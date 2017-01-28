@@ -14,6 +14,15 @@ function loadImage() {
   document.getElementsByTagName('head')[0].appendChild(favicon);
 }
 
+function download() {
+  var img = document.getElementById("main");
+  var link = document.createElement('a');
+  link.href = img.src;
+  link.download = "";
+  document.body.appendChild(link);
+  link.click();
+}
+
 function zoomIn() {
   var img = document.getElementById("main");
   var scale = window.getComputedStyle(img).getPropertyValue('--scale');
@@ -72,6 +81,7 @@ body {
       <button onclick="zoomIn()">+</button>
       <button onclick="rotate(-90)">↶</button>
       <button onclick="rotate(90)">↷</button>
+      <button onclick="download()">Download</button>
     </div>
     <div id="container">
       <img id="main" alt="Image" />
