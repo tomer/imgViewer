@@ -7,35 +7,32 @@
 function loadImage() { 
 	var img = document.getElementById("main");
 	img.src = "splash.png";
-	img.originalWidth = img.width;
-	img.originalHeight = img.height;
-
-	img.rotate="0";
-	img.width = img.width;
 }
 
 function zoomIn() {
 	var img = document.getElementById("main");
-	img.width *= 2;
+	var scale = window.getComputedStyle(img).getPropertyValue('--scale');
+	scale *=2;
+	img.style.setProperty('--scale', scale);
 }
 
 function zoomOut() {
 	var img = document.getElementById("main");
-	img.width /= 2;
+	var scale = window.getComputedStyle(img).getPropertyValue('--scale');
+	scale /=2;
+	img.style.setProperty('--scale', scale);
 }
 
 function zoomRegular() {
 	var img = document.getElementById("main");
-	img.width = img.originalWidth;
-	//img.height = img.originalHeight;
+	img.style.setProperty('--scale', 1);
 }
 
-function rotate(angle) {
+function rotate(rotate) {
 	var img = document.getElementById("main");
-	img.rotate += angle;
-	img.style.transform = "rotate("+ img.rotate +"deg)";
-	img.rotate%=360;
-	//if (img.rotate < 0) img.rotate *= -1;
+  var angle = window.getComputedStyle(img).getPropertyValue('--rotate');
+  angle = parseInt(angle);
+	img.style.setProperty('--rotate', (rotate + angle) + 'deg');
 }
 
 function main() {
@@ -44,17 +41,21 @@ function main() {
     </script>
 <style>
 #toolbar {
-	margin: auto;
-	display: inline-block;
+  z-index: 999;
+  position: fixed;
+  width: 100%;
+	text-align: center;
 }
 img#main {
   position: absolute; top: 0; bottom: 0; left: 0; right: 0;
   margin: auto;
-  border: 2px solid blue;
   transition: all 0.5s ease-in;
+  transform: scale(var(--scale)) rotate(var(--rotate));
+  --scale: 1;
+  --rotate: 0deg;
 }
 body {
-  background-image: url(chrome://global/skin/media/imagedoc-darknoise.png);
+  background-image: url(imagedoc-darknoise.png);
 }
 </style>
 
@@ -64,8 +65,8 @@ body {
 	    <button onclick="zoomOut()">-</button>
 	    <button onclick="zoomRegular()">100%</button>
 	    <button onclick="zoomIn()">+</button>
-	    <button onclick="rotate(90)">RotL</button>
-	    <button onclick="rotate(-90)">RotR</button>
+	    <button onclick="rotate(-90)">↶</button>
+	    <button onclick="rotate(90)">↷</button>
     </div>
     <div id="container">
       <img id="main" alt="Image" />
